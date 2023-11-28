@@ -6,9 +6,18 @@ import morgan from "morgan";
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// db connection
+import { connectDB } from "./src/config/dbConfig.js";
+connectDB();
+
+// middlewares
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+
+// api endpoints
+import userRouter from "./src/routers/userRouter.js";
+app.use("/api/v1/users", userRouter);
 
 app.get("/", (req, res) => {
   res.json({
