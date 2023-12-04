@@ -5,20 +5,10 @@ import {
   loginValidation,
   newUserValidation,
 } from "../middlewares/joiValidation.js";
+import { signJWTs } from "../utils/jwtHelper.js";
+import userAuth from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
-
-// get user info
-router.get("/", (req, res, next) => {
-  try {
-    res.json({
-      status: "success",
-      message: "to do get user",
-    });
-  } catch (error) {
-    next(error);
-  }
-});
 
 // creates new user
 router.post("/", async (req, res, next) => {
@@ -32,7 +22,40 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// creates new admin -> this should be private
+// login
+router.post("/login", loginValidation, async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await getUserByEmail(email);
+
+    if (user?._id) {
+      const isMatched = comparePassword(password, user.password);
+
+      if (isMatched) {
+        // jwts
+        const jwts = signJWTs(user.email);
+
+        return res.json({
+          status: "success",
+          message: "Login successful",
+          jwts,
+        });
+      }
+    }
+
+    res.json({
+      status: "error",
+      message:
+        "Sorry!!! unable to login. Please try again with correct credentials",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+//  below this should be private
+// ------------------------------
+// creates new admin
 router.post("/admin-user", newUserValidation, async (req, res, next) => {
   try {
     console.log(req.body);
@@ -62,29 +85,13 @@ router.post("/admin-user", newUserValidation, async (req, res, next) => {
   }
 });
 
-// login
-router.post("/login", loginValidation, async (req, res, next) => {
+// get user info
+router.get("/", userAuth, (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const user = await getUserByEmail(email);
-
-    if (user?._id) {
-      const isMatched = comparePassword(password, user.password);
-
-      if (isMatched) {
-        return res.json({
-          status: "success",
-          message: "Login successful",
-        });
-      }
-    }
-
-    // jwts
-
     res.json({
-      status: "error",
-      message:
-        "Sorry!!! unable to login. Please try again with correct credentials",
+      status: "success",
+      message: "here is the user info",
+      user: req.userInfo,
     });
   } catch (error) {
     next(error);
