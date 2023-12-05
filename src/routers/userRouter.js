@@ -1,12 +1,17 @@
 import express from "express";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
-import { createUser, getUserByEmail } from "../models/user/UserModel.js";
+import {
+  createUser,
+  getUserByEmail,
+  updateRefreshJWT,
+} from "../models/user/UserModel.js";
 import {
   loginValidation,
   newUserValidation,
 } from "../middlewares/joiValidation.js";
 import { signJWTs } from "../utils/jwtHelper.js";
-import userAuth from "../middlewares/authMiddleware.js";
+import { userAuth, refreshAuth } from "../middlewares/authMiddleware.js";
+import { deleteSession } from "../models/session/SessionModel.js";
 
 const router = express.Router();
 
@@ -53,12 +58,32 @@ router.post("/login", loginValidation, async (req, res, next) => {
   }
 });
 
+// logout
+router.post("/logout", async (req, res, next) => {
+  try {
+    const { accessJWT, email } = req.body;
+
+    // remove from session table
+    accessJWT && (await deleteSession({ token: accessJWT }));
+
+    // remove from user table
+    email && (await updateRefreshJWT(email, ""));
+
+    res.json({
+      status: "error",
+      message:
+        "Sorry!!! unable to login. Please try again with correct credentials",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 //  below this should be private
 // ------------------------------
 // creates new admin
 router.post("/admin-user", newUserValidation, async (req, res, next) => {
   try {
-    console.log(req.body);
     req.body.password = hashPassword(req.body.password);
     req.body.role = "admin";
     const user = await createUser(req.body);
@@ -97,5 +122,7 @@ router.get("/", userAuth, (req, res, next) => {
     next(error);
   }
 });
+
+router.get("/get-accessjwt", refreshAuth);
 
 export default router;

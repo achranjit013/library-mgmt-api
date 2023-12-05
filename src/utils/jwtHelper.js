@@ -13,11 +13,6 @@ export const signAccessJWT = (obj) => {
   return token;
 };
 
-// decode
-export const accessJWTDecode = (accessJWT) => {
-  return jwt.verify(accessJWT, process.env.JWT_ACCESS_SECRET);
-};
-
 // refresh jwt: user table, exp: 30 days
 export const signRefreshJWT = (email) => {
   try {
@@ -31,6 +26,15 @@ export const signRefreshJWT = (email) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+// decode
+export const accessJWTDecode = (accessJWT) => {
+  return jwt.verify(accessJWT, process.env.JWT_ACCESS_SECRET);
+};
+
+export const refreshJWTDecode = (refreshJWT) => {
+  return jwt.verify(refreshJWT, process.env.JWT_REFRESH_SECRET);
 };
 
 export const signJWTs = (email) => {
