@@ -19,6 +19,9 @@ app.use(morgan("dev"));
 import userRouter from "./src/routers/userRouter.js";
 app.use("/api/v1/users", userRouter);
 
+import bookRouter from "./src/routers/bookRouter.js";
+app.use("/api/v1/books", bookRouter);
+
 app.get("/", (req, res) => {
   res.json({
     status: "succes",

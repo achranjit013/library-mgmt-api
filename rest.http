@@ -1,4 +1,5 @@
 @rootAPI = http://localhost:8000/api/v1/users
+@bookAPI = http://localhost:8000/api/v1/books
 
 # admin user
 ### create new admin
@@ -13,6 +14,15 @@ Content-Type: application/json
   "password":"1"
 }
 
+### Login user
+POST {{rootAPI}}/login
+Content-Type: application/json
+
+{
+  "email": "n@n.com",  
+  "password": "1"
+}
+
 
 # student user
 ### get student profile
@@ -20,3 +30,23 @@ GET {{rootAPI}}
 
 ### create new student profile
 POST {{rootAPI}}
+
+# ============== book api 
+
+
+###Get all the books 
+GET {{bookAPI}}
+
+### post new book
+POST {{bookAPI}}
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5Abi5jb20iLCJpYXQiOjE3MDIyNjU2MzIsImV4cCI6MTcwMjI2NjUzMn0._Or4g2rGm32eO0M7lPY6dAssBvYJGTgyq2z1gUmInr8
+
+{
+   "thumbnail": "https://m.media-amazon.com/images/I/51-5ZXYtcML.jpg",
+    "name": "Eloquent Javascript",
+    "author": "Marijn Haverbeke",
+    "publishYear": 2011,
+    "isbn": "978159327fs2d8212",
+    "description": "JavaScript lies at the heart of almost every modern web application, from social apps like Twitter to browser-based game frameworks like Phaser and Babylon. Though simple for beginners to pick up and play with, JavaScript is a flexible, complex language that you can use to build full-scale applications. This much anticipated and thoroughly revised third edition of Eloquent JavaScript dives deep into the JavaScript language to show you how to write beautiful, effective code. It has been updated to reflect the current state of Java¬Script and web browsers and includes brand-new material on features like class notation, arrow functions, iterators, async functions, template strings, and block scope. A host of new exercises have also been added to test your skills and keep you on track. As w..."
+}
