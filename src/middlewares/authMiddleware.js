@@ -6,26 +6,35 @@ import {
   signAccessJWT,
 } from "../utils/jwtHelper.js";
 
+export const getUserFromAccessJWT = async (accessJWT) => {
+  // validate if accessJWT is valid
+  const decoded = accessJWTDecode(accessJWT);
+  if (decoded?.email) {
+    // check if exists in session table
+    const tokenExist = await getSession({ token: accessJWT });
+    if (tokenExist?._id) {
+      // extract the email, get user by email
+      const user = await getUserByEmail(decoded.email);
+      if (user?._id) {
+        // if everything true -> set user info to req obj and sent to next middleware
+        user.password = undefined;
+        return user;
+      }
+    }
+  }
+  return false;
+};
+
 export const userAuth = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
 
-    // validate if accessJWT is valid
-    const decoded = accessJWTDecode(authorization);
-    if (decoded?.email) {
-      // check if exists in session table
-      const tokenExist = await getSession({ token: authorization });
-      if (tokenExist?._id) {
-        // extract the email, get user by email
-        const user = await getUserByEmail(decoded.email);
-        if (user?._id) {
-          // if everything true -> set user info to req obj and sent to next middleware
-          user.password = undefined;
-          req.userInfo = user;
+    const user = await getUserFromAccessJWT(authorization);
 
-          return next();
-        }
-      }
+    if (user?._id) {
+      user.password = undefined;
+      req.userInfo = user;
+      return next();
     }
 
     throw new Error("Invalid token, unauthorized!");
@@ -42,22 +51,14 @@ export const adminAuth = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
 
-    // validate if accessJWT is valid
-    const decoded = accessJWTDecode(authorization);
-    if (decoded?.email) {
-      // check if exists in session table
-      const tokenExist = await getSession({ token: authorization });
-      if (tokenExist?._id) {
-        // extract the email, get user by email
-        const user = await getUserByEmail(decoded.email);
-        if (user?.role === "admin") {
-          // if everything true -> set user info to req obj and sent to next middleware
-          user.password = undefined;
-          req.userInfo = user;
+    const user = await getUserFromAccessJWT(authorization);
 
-          return next();
-        }
-      }
+    if (user?.role === "admin") {
+      // if everything true -> set user info to req obj and sent to next middleware
+      user.password = undefined;
+      req.userInfo = user;
+
+      return next();
     }
 
     throw new Error("Invalid token, unauthorized!");

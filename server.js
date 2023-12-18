@@ -22,6 +22,13 @@ app.use("/api/v1/users", userRouter);
 import bookRouter from "./src/routers/bookRouter.js";
 app.use("/api/v1/books", bookRouter);
 
+import burrowRouter from "./src/routers/burrowRouter.js";
+import { userAuth } from "./src/middlewares/authMiddleware.js";
+app.use("/api/v1/burrows", userAuth, burrowRouter);
+
+// import studentRouter from "./src/routers/studentRouter.js";
+// app.use("/api/v1/students", adminAuth, studentRouter);
+
 app.get("/", (req, res) => {
   res.json({
     status: "succes",

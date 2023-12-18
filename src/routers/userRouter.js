@@ -2,6 +2,7 @@ import express from "express";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import {
   createUser,
+  getAllStudents,
   getUserByEmail,
   updateRefreshJWT,
 } from "../models/user/UserModel.js";
@@ -10,7 +11,11 @@ import {
   newUserValidation,
 } from "../middlewares/joiValidation.js";
 import { signJWTs } from "../utils/jwtHelper.js";
-import { userAuth, refreshAuth } from "../middlewares/authMiddleware.js";
+import {
+  userAuth,
+  refreshAuth,
+  adminAuth,
+} from "../middlewares/authMiddleware.js";
 import { deleteSession } from "../models/session/SessionModel.js";
 
 const router = express.Router();
@@ -117,6 +122,21 @@ router.get("/", userAuth, (req, res, next) => {
       status: "success",
       message: "here is the user info",
       user: req.userInfo,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// get students
+router.get("/all-students", adminAuth, async (req, res, next) => {
+  try {
+    const students = await getAllStudents({ role: "student" });
+
+    res.json({
+      status: "success",
+      message: "Here are the students",
+      students,
     });
   } catch (error) {
     next(error);

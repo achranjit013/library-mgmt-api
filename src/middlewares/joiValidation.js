@@ -6,6 +6,7 @@ const LONGSTR = Joi.string().max(500);
 const LONGSTRREQ = Joi.string().max(5000).required();
 const SHORTNUM = Joi.number();
 const SHORTNUMREQ = Joi.number().required();
+const BOOLTRUE = Joi.boolean();
 
 const validationProcessor = ({ schemaObj, req, res, next }) => {
   try {
@@ -92,6 +93,21 @@ export const updateBookValidation = (req, res, next) => {
     author: SHORTSTRREQ,
     publishYear: SHORTNUMREQ,
     description: LONGSTRREQ,
+    isAvailable: BOOLTRUE,
+    dueDate: null,
+  };
+
+  validationProcessor({ schemaObj, req, res, next });
+};
+
+// burrow validation
+export const newBurrowValidation = (req, res, next) => {
+  const schemaObj = {
+    bookId: SHORTSTRREQ,
+    bookName: SHORTSTRREQ,
+    thumbnail: LONGSTRREQ,
+    userId: SHORTSTRREQ,
+    userName: SHORTSTRREQ,
   };
 
   validationProcessor({ schemaObj, req, res, next });

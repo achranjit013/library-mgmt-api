@@ -2,6 +2,7 @@ import express from "express";
 import {
   createBook,
   deleteBook,
+  getABook,
   getAllBooks,
   getBookById,
   updateBookById,
@@ -10,15 +11,32 @@ import {
   newBookValidation,
   updateBookValidation,
 } from "../middlewares/joiValidation.js";
-import { adminAuth, userAuth } from "../middlewares/authMiddleware.js";
+import {
+  adminAuth,
+  getUserFromAccessJWT,
+  userAuth,
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.get("/:_id?", async (req, res, next) => {
   try {
+    const { authorization } = req.headers;
+    let filter = { status: "active" };
+
+    if (authorization) {
+      const user = await getUserFromAccessJWT(authorization);
+
+      if (user?.role === "admin") {
+        filter = {};
+      }
+    }
+
     const { _id } = req.params;
-    console.log(_id);
-    const books = _id ? await getBookById(_id) : await getAllBooks();
+    const books = _id
+      ? await getABook({ ...filter, _id })
+      : await getAllBooks(filter);
+
     res.json({
       status: "success",
       message: "Here are the books",
@@ -47,7 +65,6 @@ router.post("/", userAuth, newBookValidation, async (req, res, next) => {
       : res.json({
           status: "Error",
           message: "Unable to add New book, try again later",
-          books,
         });
   } catch (error) {
     if (error.message.includes("E11000 duplicate key error collection")) {
