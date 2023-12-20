@@ -26,6 +26,9 @@ import burrowRouter from "./src/routers/burrowRouter.js";
 import { userAuth } from "./src/middlewares/authMiddleware.js";
 app.use("/api/v1/burrows", userAuth, burrowRouter);
 
+import reviewRouter from "./src/routers/reviewRouter.js";
+app.use("/api/v1/reviews", reviewRouter);
+
 // import studentRouter from "./src/routers/studentRouter.js";
 // app.use("/api/v1/students", adminAuth, studentRouter);
 

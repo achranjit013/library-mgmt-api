@@ -112,3 +112,17 @@ export const newBurrowValidation = (req, res, next) => {
 
   validationProcessor({ schemaObj, req, res, next });
 };
+
+// review validation
+export const newReviewValidation = (req, res, next) => {
+  const schemaObj = {
+    bookId: SHORTSTRREQ,
+    bookName: SHORTSTRREQ,
+    message: LONGSTRREQ,
+    burrowHistoryId: SHORTSTRREQ,
+    title: SHORTSTRREQ,
+    rating: SHORTNUMREQ,
+  };
+
+  validationProcessor({ schemaObj, req, res, next });
+};
